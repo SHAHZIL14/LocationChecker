@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Location</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: blanchedalmond;
+        }
+
+        .main {
+            height: 50%;
+            width: 75%;
+            border: 2px solid black;
+            /* display: flex;
+            justify-content: center;
+            align-items: center; */
+        }
+
+        .btn {
+            padding: 10px;
+            margin: 20px;
+            font-size: 15px;
+            border: 2px solid black;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: rgb(206, 190, 165);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main">
+            <div class="btn" onclick="GetAddress()">Get Location</div>
+            <div class="FullAddress" style="font-size: 20px; text-align: center;">Full Address:-> <br></div>
+        </div>
+    </div>
+    <script>
+
+        const GetAddress = () => {
+
+            let Latitude;
+            let Longitude;
+
+            let getFullAddress = async (latyy, longyy) => {
+                console.log(latyy, longyy);
+                const ApiUrl = `https://trueway-geocoding.p.rapidapi.com/ReverseGeocode?location=${latyy},${longyy}&language=en`;
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        'X-RapidAPI-Key': '9f574b0ec8mshe6057dee19e9ee7p1d2d3bjsnf5430e6c93c7',
+                        'X-RapidAPI-Host': 'trueway-geocoding.p.rapidapi.com'
+                    }
+                };
+                let fetching = await fetch(ApiUrl, options);
+                let data = await fetching.json();
+                console.log(data);
+                //     const { city, state, postcode, country, county } = data.results[0].components;
+                 document.getElementsByClassName('FullAddress')[0].innerHTML =`Full Address:->`;
+                for (let index = 0; index < data.results.length; index++) {
+                   
+                    document.getElementsByClassName('FullAddress')[0].innerHTML += `<br>${index + 1}: &nbsp;${(data.results[index].address)} <br>`;
+                }
+
+            }
+
+            const GetLocation = () => {
+                if (navigator.geolocation) {
+                    try {
+                        console.log("If try")
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            Latitude = position.coords.latitude;
+                            Longitude = position.coords.longitude;
+                            getFullAddress(Latitude, Longitude);
+
+                        }, (error) => {
+                             document.getElementsByClassName('FullAddress')[0].innerHTML = `${error.message} <br> Turn on the location and try again.`;
+                        })
+                    } catch (error) {
+                        console.log("if catch")
+                        console.log(error);
+                    }
+                }
+                else{
+                    console.log("else ")
+                    document.getElementsByClassName('FullAddress')[0].innerHTML = 'Geolocation is not supported by this browser.';
+                }
+            }
+
+            GetLocation();
+
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
